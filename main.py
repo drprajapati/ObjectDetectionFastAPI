@@ -1,13 +1,15 @@
 import numpy as np
 import io
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Response
 from enum import Enum
 from fastapi.responses import StreamingResponse
 import cv2
 import cvlib as cv
 from cvlib.object_detection import draw_bbox
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 
 class Model(str, Enum):
@@ -16,8 +18,8 @@ class Model(str, Enum):
 
 
 @app.get("/")
-def home():
-    return "Head Over to http://localhost:8000/docs"
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/predict")
