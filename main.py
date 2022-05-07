@@ -1,11 +1,8 @@
 import numpy as np
 import io
 from fastapi import FastAPI, UploadFile, File, HTTPException
-import uvicorn
 from enum import Enum
 from fastapi.responses import StreamingResponse
-
-import os
 import cv2
 import cvlib as cv
 from cvlib.object_detection import draw_bbox
@@ -21,6 +18,7 @@ class Model(str, Enum):
 @app.get("/")
 def home():
     return "Head Over to http://localhost:8000/docs"
+
 
 @app.post("/predict")
 def predict(model: Model, file: UploadFile = File(...)):
@@ -40,6 +38,3 @@ def predict(model: Model, file: UploadFile = File(...)):
     cv2.imwrite(filename=f"images_uploaded/{filename}", img=output)
     output_image = open(f"images_uploaded/{filename}", mode="rb")
     return StreamingResponse(content=output_image, media_type='image/jpeg')
-
-
-
