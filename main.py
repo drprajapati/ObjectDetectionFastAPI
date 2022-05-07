@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import io
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Response
@@ -19,12 +21,14 @@ class Model(str, Enum):
 
 @app.get("/")
 def home(request: Request):
+
     return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/predict")
 def predict(model: Model, file: UploadFile = File(...)):
     filename = file.filename
+    print(filename)
     file_extension = filename.split(".")[-1] in ("jpeg", "png", "jpg")
     if not file_extension:
         raise HTTPException(status_code=415, detail="Unsupported file provided")
@@ -34,7 +38,6 @@ def predict(model: Model, file: UploadFile = File(...)):
     file_bytes = np.asarray(bytearray(image_stream.read()), dtype=np.uint8)
 
     image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-    cv2.imshow("Image", image)
     bbox, label, confidence = cv.detect_common_objects(image, model=model)
     output = draw_bbox(img=image, bbox=bbox, labels=label, confidence=confidence)
     cv2.imwrite(filename=f"images_uploaded/{filename}", img=output)

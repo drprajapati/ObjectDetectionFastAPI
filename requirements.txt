@@ -1,0 +1,4 @@
+fastapi[All]
+numpy
+opencv-python
+cvlib
